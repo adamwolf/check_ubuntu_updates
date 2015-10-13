@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+if [ -e venv ]; then
+  rm -r venv
+fi
+
+virtualenv venv
+source venv/bin/activate
+pip install flake8
+
+tests/lint

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#Adam Wolf 2014
+
+if [ ! -f "/var/run/reboot-required" ]; then
+    echo "OK"
+    exit 0
+else
+    PKGS=$(cat /var/run/reboot-required.pkgs)
+    echo "WARNING - $PKGS"
+    exit 1
+fi

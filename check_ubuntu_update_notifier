@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+from subprocess import STDOUT, check_output
+import sys
+import argparse
+
+
+__author__ = 'wolf'
+
+
+APT_CHECK = "/usr/lib/update-notifier/apt-check"
+
+
+def parse_args():
+    description = 'Use {0} to check for number of updates (and security updates) on a system.'.format(APT_CHECK)
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('-w', '--warning',
+                        default=False,
+                        help="""Emit a warning if count of updates or security updates is greater than this threshold.
+Format is UPDATECOUNT,SECURITYUPDATECOUNT""")
+    parser.add_argument('-c', '--critical',
+                        default=False,
+                        help="""Emit a critical state if count of updates or security updates is greater than this threshold.
+Format is UPDATECOUNT,SECURITYUPDATECOUNT.""")
+    return parser.parse_args()
+
+
+def check_update_notifier():
+    output = check_output([APT_CHECK], stderr=STDOUT)   # will raise an Error if doesn't return 0 but is ok
+    update_count, security_update_count = output.split(";")
+    return int(update_count), int(security_update_count), output
+
+
+def main():
+    args = parse_args()
+    update_count, security_count, output = check_update_notifier()
+
+    if args.critical:
+        update_critical_threshold, security_critical_threshold = [int(foo) for foo in args.critical.split(',')]
+        if update_count > update_critical_threshold or security_count > security_critical_threshold:
+            print "CRITICAL WARNING: {0}".format(output)
+            sys.exit(2)
+
+    if args.warning:
+        update_warning_threshold, security_warning_threshold = [int(foo) for foo in args.warning.split(',')]
+        if update_count > update_warning_threshold or security_count > security_warning_threshold:
+            print "UPDATES WARNING: {0}".format(output)
+            sys.exit(1)
+
+    print "UPDATES OK: {0}".format(output)
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
