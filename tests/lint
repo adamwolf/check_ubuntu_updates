@@ -2,6 +2,6 @@
 set -e
 
 shellcheck check_ubuntu_requires_reboot
-shellcheck tests/lint -s bash -x
-shellcheck tests/ci -s bash -e SC1091
+shellcheck tests/lint
+shellcheck tests/ci -e SC1091
 flake8 check_ubuntu_update_notifier --max-line-length=119

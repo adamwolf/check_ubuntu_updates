@@ -7,7 +7,10 @@ if [ -e venv ]; then
 fi
 
 virtualenv venv
-source venv/bin/activate
+. venv/bin/activate
 pip install flake8
 
+echo "Checking..."
 tests/lint
+
+echo "Everything passed."
